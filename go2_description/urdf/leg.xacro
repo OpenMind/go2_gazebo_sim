@@ -2,7 +2,7 @@
 
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <!-- <xacro:include filename="$(find unitree_go2_description)/transmission.xacro"/> -->
+    <!-- <xacro:include filename="$(find go2_description)/transmission.xacro"/> -->
 
     <xacro:macro name="leg" params="name mirror mirror_dae front_hind front_hind_dae">
 
@@ -28,7 +28,7 @@
             </xacro:if>
             <xacro:if value="${(mirror_dae == False)}">
                 <limit effort="${hip_torque_max}" velocity="${hip_velocity_max}" lower="${-hip_position_max}" upper="${-hip_position_min}"/>
-            </xacro:if>            
+            </xacro:if>
         </joint>
 
 
@@ -47,7 +47,7 @@
                     <origin rpy="${PI} ${PI} 0" xyz="0 0 0"/>
                 </xacro:if>
                 <geometry>
-                    <mesh filename="file://$(find unitree_go2_description)/meshes/hip.dae" scale="1 1 1"/>
+                    <mesh filename="file://$(find go2_description)/meshes/hip.dae" scale="1 1 1"/>
                 </geometry>
                 <!-- <material name="orange"/> -->
             </visual>
@@ -63,7 +63,7 @@
                 <inertia
                     ixx="${hip_ixx}" ixy="${hip_ixy*mirror*front_hind}" ixz="${hip_ixz*front_hind}"
                     iyy="${hip_iyy}" iyz="${hip_iyz*mirror}"
-                    izz="${hip_izz}"/>       
+                    izz="${hip_izz}"/>
             </inertial>
         </link>
 
@@ -82,10 +82,10 @@
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
                     <xacro:if value="${mirror_dae == True}">
-                        <mesh filename="file://$(find unitree_go2_description)/meshes/thigh.dae" scale="1 1 1"/>
+                        <mesh filename="file://$(find go2_description)/meshes/thigh.dae" scale="1 1 1"/>
                     </xacro:if>
                     <xacro:if value="${mirror_dae == False}">
-                        <mesh filename="file://$(find unitree_go2_description)/meshes/thigh_mirror.dae" scale="1 1 1"/>
+                        <mesh filename="file://$(find go2_description)/meshes/thigh_mirror.dae" scale="1 1 1"/>
                     </xacro:if>
                 </geometry>
                 <!-- <material name="orange"/> -->
@@ -94,7 +94,7 @@
                 <origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-thigh_length/2.0}"/>
                 <geometry>
                     <box size="${thigh_length} ${thigh_width} ${thigh_height}"/>
-                </geometry>      
+                </geometry>
             </collision>
             <inertial>
                 <origin rpy="0 0 0" xyz="${thigh_com_x} ${thigh_com_y*mirror} ${thigh_com_z}"/>
@@ -102,7 +102,7 @@
                 <inertia
                     ixx="${thigh_ixx}" ixy="${thigh_ixy*mirror}" ixz="${thigh_ixz}"
                     iyy="${thigh_iyy}" iyz="${thigh_iyz*mirror}"
-                    izz="${thigh_izz}"/>       
+                    izz="${thigh_izz}"/>
             </inertial>
         </link>
 
@@ -121,7 +121,7 @@
             <visual>
                 <origin rpy="0 0 0" xyz="0 0 0"/>
                 <geometry>
-                    <mesh filename="file://$(find unitree_go2_description)/meshes/calf.dae" scale="1 1 1"/>
+                    <mesh filename="file://$(find go2_description)/meshes/calf.dae" scale="1 1 1"/>
                 </geometry>
                 <!-- <material name="orange"/> -->
             </visual>
@@ -129,7 +129,7 @@
                 <origin rpy="0 ${PI/2.0} 0" xyz="0 0 ${-calf_length/2.0}"/>
                 <geometry>
                     <box size="${calf_length} ${calf_width} ${calf_height}"/>
-                </geometry>      
+                </geometry>
             </collision>
             <inertial>
                 <origin rpy="0 0 0" xyz="${calf_com_x} ${calf_com_y} ${calf_com_z}"/>
@@ -137,7 +137,7 @@
                 <inertia
                     ixx="${calf_ixx}" ixy="${calf_ixy}" ixz="${calf_ixz}"
                     iyy="${calf_iyy}" iyz="${calf_iyz}"
-                    izz="${calf_izz}"/>       
+                    izz="${calf_izz}"/>
             </inertial>
         </link>
 
@@ -167,7 +167,7 @@
                 <inertia
                     ixx="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" ixy="0.0" ixz="0.0"
                     iyy="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}" iyz="0.0"
-                    izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}"/>             
+                    izz="${(2*foot_mass)/5.0*(foot_radius*foot_radius)}"/>
             </inertial>
         </link>
 
@@ -180,19 +180,19 @@
                 <state_interface name="position"/>
                 <state_interface name="velocity"/>
             </joint>
-        
+
             <joint name="${name}_upper_leg_joint">
                 <command_interface name="effort"/>
                 <state_interface name="position"/>
                 <state_interface name="velocity"/>
             </joint>
-        
+
             <joint name="${name}_lower_leg_joint">
                 <command_interface name="effort"/>
                 <state_interface name="position"/>
                 <state_interface name="velocity"/>
             </joint>
-        </ros2_control> 
+        </ros2_control>
 
         <!-- <xacro:leg_transmission name="${name}"/> -->
 

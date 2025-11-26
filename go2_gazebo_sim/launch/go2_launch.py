@@ -21,19 +21,19 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration("use_sim_time")
     base_frame = "base_link"
 
-    unitree_go2_gazebo_sim = launch_ros.substitutions.FindPackageShare(
-        package="unitree_go2_gazebo_sim").find("unitree_go2_gazebo_sim")
-    unitree_go2_description = launch_ros.substitutions.FindPackageShare(
-        package="unitree_go2_description").find("unitree_go2_description")
-    
-    joints_config = os.path.join(unitree_go2_gazebo_sim, "config/joints/joints.yaml")
+    go2_gazebo_sim = launch_ros.substitutions.FindPackageShare(
+        package="go2_gazebo_sim").find("go2_gazebo_sim")
+    go2_description = launch_ros.substitutions.FindPackageShare(
+        package="go2_description").find("go2_description")
+
+    joints_config = os.path.join(go2_gazebo_sim, "config/joints/joints.yaml")
     ros_control_config = os.path.join(
-        unitree_go2_gazebo_sim, "config/ros_control/ros_control.yaml"
+        go2_gazebo_sim, "config/ros_control/ros_control.yaml"
     )
-    gait_config = os.path.join(unitree_go2_gazebo_sim, "config/gait/gait.yaml")
-    links_config = os.path.join(unitree_go2_gazebo_sim, "config/links/links.yaml")
-    default_model_path = os.path.join(unitree_go2_description, "urdf/unitree_go2_robot.xacro")
-    default_world_path = os.path.join(unitree_go2_description, "worlds/default.sdf")
+    gait_config = os.path.join(go2_gazebo_sim, "config/gait/gait.yaml")
+    links_config = os.path.join(go2_gazebo_sim, "config/links/links.yaml")
+    default_model_path = os.path.join(go2_description, "urdf/unitree_go2_robot.xacro")
+    default_world_path = os.path.join(go2_description, "worlds/maze_world.sdf")
 
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
@@ -68,20 +68,20 @@ def generate_launch_description():
         "world_init_heading", default_value="0.0"
     )
     declare_description_path = DeclareLaunchArgument(
-        "unitree_go2_description_path",
+        "go2_description_path",
         default_value=default_model_path,
         description="Path to the robot description xacro file",
     )
-    
+
     declare_publish_map_tf = DeclareLaunchArgument(
         "publish_map_tf",
         default_value="true",
         description="Publish static map to odom transform",
     )
-    
+
     # Description nodes and parameters
-    robot_description = {"robot_description": Command(["xacro ", LaunchConfiguration("unitree_go2_description_path")])}
-    
+    robot_description = {"robot_description": Command(["xacro ", LaunchConfiguration("go2_description_path")])}
+
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -91,7 +91,7 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time}
         ],
     )
-    
+
     # CHAMP controller nodes
     quadruped_controller_node = Node(
         package="champ_base",
@@ -104,7 +104,7 @@ def generate_launch_description():
             {"publish_joint_control": True},
             {"publish_foot_contacts": False},
             {"joint_controller_topic": "joint_group_effort_controller/joint_trajectory"},
-            {"urdf": Command(['xacro ', LaunchConfiguration('unitree_go2_description_path')])},
+            {"urdf": Command(['xacro ', LaunchConfiguration('go2_description_path')])},
             joints_config,
             links_config,
             gait_config,
@@ -122,7 +122,7 @@ def generate_launch_description():
         parameters=[
             {"use_sim_time": use_sim_time},
             {"orientation_from_imu": True},
-            {"urdf": Command(['xacro ', LaunchConfiguration('unitree_go2_description_path')])},
+            {"urdf": Command(['xacro ', LaunchConfiguration('go2_description_path')])},
             joints_config,
             links_config,
             gait_config,
@@ -181,8 +181,8 @@ def generate_launch_description():
         ],
         condition=IfCondition(LaunchConfiguration("publish_map_tf")),
     )
-    
-    # Go2 URDF connection (base_footprint -> base_link)  
+
+    # Go2 URDF connection (base_footprint -> base_link)
     base_footprint_to_base_link_tf_node = Node(
         package='tf2_ros',
         name='base_footprint_to_base_link_tf_node',
@@ -199,13 +199,13 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', os.path.join(unitree_go2_gazebo_sim, "rviz/rviz.rviz")],
+        arguments=['-d', os.path.join(go2_gazebo_sim, "rviz/rviz.rviz")],
         condition=IfCondition(LaunchConfiguration("rviz")),
         # parameters=[{"use_sim_time": use_sim_time}]
     )
-    
+
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
-    
+
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -214,7 +214,7 @@ def generate_launch_description():
             'gz_args': [LaunchConfiguration('world'), ' -r']  # Add -r flag to start unpaused
         }.items(),
     )
-    
+
     # Spawn robot in Gazebo Sim
     gazebo_spawn_robot = Node(
         package='ros_gz_sim',
@@ -229,7 +229,7 @@ def generate_launch_description():
             '-Y', LaunchConfiguration('world_init_heading')
         ],
     )
-    
+
     # Bridge ROS 2 topics to Gazebo Sim
     gazebo_bridge = Node(
         package='ros_gz_bridge',
@@ -248,13 +248,13 @@ def generate_launch_description():
             '/scan@sensor_msgs/msg/LaserScan@gz.msgs.LaserScan',
             '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
             '/rgb_image@sensor_msgs/msg/Image@gz.msgs.Image',
-            
+
             # ROS to Gazebo
             '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/joint_group_effort_controller/joint_trajectory@trajectory_msgs/msg/JointTrajectory]gz.msgs.JointTrajectory',
         ],
     )
-    
+
 
 
     # Use spawner nodes directly to handle the configuration step. (load → configure → activate)
@@ -289,8 +289,8 @@ def generate_launch_description():
             )
         ]
     )
-    
-    # Shell script to manually check controller status 
+
+    # Shell script to manually check controller status
     controller_status_check = TimerAction(
         period=25.0,  # Check status after controllers should be loaded
         actions=[
@@ -300,7 +300,7 @@ def generate_launch_description():
             )
         ]
     )
-    
+
     return LaunchDescription(
         [
             # Launch arguments
@@ -315,34 +315,34 @@ def generate_launch_description():
             declare_world_init_y,
             declare_world_init_z,
             declare_world_init_heading,
-            declare_description_path, 
-            declare_publish_map_tf, 
-            
+            declare_description_path,
+            declare_publish_map_tf,
+
             # Gazebo and robot nodes first
             gz_sim,
             robot_state_publisher_node,
             gazebo_spawn_robot,
             gazebo_bridge,
-            
 
-            
+
+
             # CHAMP controller nodes
             quadruped_controller_node,
             state_estimator_node,
-            
+
             # EKF nodes for localization
             # base_to_footprint_ekf,
             # footprint_to_odom_ekf,
-            
+
             # TF publishers for frame connections
             map_to_odom_tf_node,
             base_footprint_to_base_link_tf_node,
-            
+
             # Controller spawners that handle the complete lifecycle
             controller_spawner_js,
             controller_spawner_effort,
             controller_status_check,
-            
+
             # Visualization (only if rviz flag is set)
             rviz2,
         ]

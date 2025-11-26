@@ -7,53 +7,53 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
-    unitree_go2_gazebo_sim = FindPackageShare("unitree_go2_gazebo_sim")
+    go2_gazebo_sim = FindPackageShare("go2_gazebo_sim")
     go2_sdk = FindPackageShare("go2_sdk")
-    
+
     nav2_config = PathJoinSubstitution([go2_sdk, "config", "nav2_params.yaml"])
     rviz_config = PathJoinSubstitution([go2_sdk, "config", "rviz.rviz"])
-    
+
     use_sim_time = LaunchConfiguration("use_sim_time")
     map_file = LaunchConfiguration("map")
     world = LaunchConfiguration("world")
-    
+
     declare_use_sim_time = DeclareLaunchArgument(
         "use_sim_time",
         default_value="true",
         description="Use simulation (Gazebo) clock if true",
     )
-    
+
     declare_map = DeclareLaunchArgument(
         "map",
-        default_value=PathJoinSubstitution([unitree_go2_gazebo_sim, "map", "map.yaml"]), # Default map path, might need to be created
+        default_value=PathJoinSubstitution([go2_gazebo_sim, "map", "map.yaml"]), # Default map path, might need to be created
         description="Full path to map yaml file to load",
     )
-    
-    unitree_go2_description = FindPackageShare("unitree_go2_description")
-    
+
+    go2_description = FindPackageShare("go2_description")
+
     declare_world = DeclareLaunchArgument(
         "world",
         default_value="maze_world.sdf",
         description="World file name (e.g., walled_world.sdf, maze_world.sdf)",
     )
-    
-    world_path = PathJoinSubstitution([unitree_go2_description, "worlds", world])
+
+    world_path = PathJoinSubstitution([go2_description, "worlds", world])
 
     # Include the simulation launch file
     # Disable rviz in sim launch, we launch it here
     # Disable publish_map_tf because AMCL handles it
     sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            PathJoinSubstitution([unitree_go2_gazebo_sim, "launch", "unitree_go2_launch.py"])
+            PathJoinSubstitution([go2_gazebo_sim, "launch", "unitree_go2_launch.py"])
         ),
         launch_arguments={
             "use_sim_time": use_sim_time,
-            "rviz": "false", 
+            "rviz": "false",
             "publish_map_tf": "false",
             "world": world_path,
         }.items(),
     )
-    
+
     nav2_nodes = [
         Node(
             package="nav2_controller",
@@ -63,7 +63,7 @@ def generate_launch_description():
             remappings=[
                 ("/cmd_vel", "/cmd_vel_nav"),
                 ("/utlidar/cloud_deskewed", "/unitree_lidar/points"),
-            ], 
+            ],
         ),
         Node(
             package="nav2_smoother",
@@ -126,7 +126,7 @@ def generate_launch_description():
             parameters=[nav2_config, {"use_sim_time": use_sim_time}],
         ),
     ]
-    
+
     # Lifecycle manager
     nav2_lifecycle_manager = Node(
         package="nav2_lifecycle_manager",
@@ -149,7 +149,7 @@ def generate_launch_description():
             ]},
         ],
     )
-    
+
     # RViz
     rviz_node = Node(
         package="rviz2",

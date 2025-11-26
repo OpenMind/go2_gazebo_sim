@@ -26,14 +26,14 @@
   <!-- ROS2 Control plugin -->
   <gazebo>
     <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-      <parameters>$(find unitree_go2_gazebo_sim)/config/ros_control/ros_control.yaml</parameters>
+      <parameters>$(find go2_gazebo_sim)/config/ros_control/ros_control.yaml</parameters>
       <robot_param_node>robot_state_publisher</robot_param_node>
     </plugin>
   </gazebo>
 
   <!-- Odometry plugin -->
   <gazebo>
-  <plugin filename="libignition-gazebo-odometry-publisher-system.so" 
+  <plugin filename="libignition-gazebo-odometry-publisher-system.so"
           name="ignition::gazebo::systems::OdometryPublisher">
       <odom_frame>odom</odom_frame>
       <robot_base_frame>base_link</robot_base_frame>

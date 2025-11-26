@@ -36,19 +36,33 @@ This repository contains the ROS 2 Gazebo simulation packages for the Unitree Go
     source install/setup.bash
     ```
 
+6.  Setup CycloneDDS
+    The network interface is your WiFi adapter. Replace `wlxbc071d7223b6` with your own network interface name found via `ifconfig` or `ip a`.
+    ```bash
+    <CycloneDDS>
+        <Domain>
+            <General>
+            <Interfaces>
+                <NetworkInterface name="wlxbc071d7223b6" priority="default" multicast="default" />
+            </Interfaces>
+            </General>
+        </Domain>
+    </CycloneDDS>
+    ```
+
 ## Usage
 
 ### 1. Launch SLAM (Mapping)
 To launch the simulation and start mapping the environment:
 ```bash
-ros2 launch unitree_go2_gazebo_sim unitree_go2_slam.launch.py
+ros2 launch go2_gazebo_sim go2_slam_launch.py
 ```
 
 **Default world**: `maze_world.sdf` (mini maze with narrow corridors and slopes)
 
 To use a different world:
 ```bash
-ros2 launch unitree_go2_gazebo_sim unitree_go2_slam.launch.py world:=default.sdf
+ros2 launch go2_gazebo_sim go2_slam_launch.py world:=default.sdf
 ```
 
 #### Control the Robot with Teleop
@@ -77,19 +91,19 @@ This will create `my_map.yaml` and `my_map.pgm` in your home directory.
 ### 3. Launch Navigation
 To launch the simulation with the navigation stack using your saved map:
 ```bash
-ros2 launch unitree_go2_gazebo_sim unitree_go2_nav.launch.py map:=${HOME}/my_map.yaml
+ros2 launch go2_gazebo_sim go2_nav_launch.py map:=${HOME}/my_map.yaml
 ```
 
 To use a different world:
 ```bash
-ros2 launch unitree_go2_gazebo_sim unitree_go2_nav.launch.py world:=default.sdf map:=${HOME}/my_map.yaml
+ros2 launch go2_gazebo_sim go2_nav_launch.py world:=default.sdf map:=${HOME}/my_map.yaml
 ```
 
 You can now set 2D Pose Estimates and Navigation Goals in RViz.
 
 ## Packages
-- `unitree_go2_gazebo_sim`: Main Gazebo simulation launch files and configurations.
-- `unitree_go2_description`: URDF, mesh files, and world definitions for the robot.
+- `go2_gazebo_sim`: Main Gazebo simulation launch files and configurations.
+- `go2_description`: URDF, mesh files, and world definitions for the robot.
 - `champ`: Quadruped controller framework.
 
 ## World Files

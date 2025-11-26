@@ -12,7 +12,7 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="file://$(find unitree_go2_description)/meshes/L1_4D_Lidar.dae" scale="1 1 1"/>
+                <mesh filename="file://$(find go2_description)/meshes/L1_4D_Lidar.dae" scale="1 1 1"/>
             </geometry>
             <material name="black">
                 <color rgba="0.0 0.0 0.0 1.0"/>
@@ -21,7 +21,7 @@
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="file://$(find unitree_go2_description)/meshes/L1_4D_Lidar.dae" scale="1 1 1"/>
+                <mesh filename="file://$(find go2_description)/meshes/L1_4D_Lidar.dae" scale="1 1 1"/>
             </geometry>
             <material name="black">
                 <color rgba="0.0 0.0 0.0 1.0"/>
